@@ -1,5 +1,5 @@
-#ifndef EXAMPLE_REGISTER_TYPES_H
-#define EXAMPLE_REGISTER_TYPES_H
+#ifndef VPX_REGISTER_TYPES_H
+#define VPX_REGISTER_TYPES_H
 
 #include <godot_cpp/core/class_db.hpp>
 
@@ -8,4 +8,4 @@ using namespace godot;
 void initialize_vpx_module(ModuleInitializationLevel p_level);
 void uninitialize_vpx_module(ModuleInitializationLevel p_level);
 
-#endif // EXAMPLE_REGISTER_TYPES_H
+#endif // VPX_REGISTER_TYPES_H

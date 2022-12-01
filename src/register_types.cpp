@@ -5,20 +5,25 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
+#include <godot_cpp/classes/resource_loader.hpp>
 
 #include "video_stream_vpx.h"
 #include "tests.h"
 
 using namespace godot;
 
+static Ref<ResourceFormatLoaderVPX> resource_loader_vpx;
+
 void initialize_vpx_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
 	}
 
-	// TODO: ResourceLoader
+	resource_loader_vpx.instantiate();
+	ResourceLoader::get_singleton()->add_resource_format_loader(resource_loader_vpx, true);
 
 	GDREGISTER_CLASS(VideoStreamVPX);
+	
 }
 
 void uninitialize_vpx_module(ModuleInitializationLevel p_level) {
@@ -26,7 +31,8 @@ void uninitialize_vpx_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 
-	// TODO: ResourceLoader
+	ResourceLoader::get_singleton()->remove_resource_format_loader(resource_loader_vpx);
+	resource_loader_vpx.unref();
 }
 
 extern "C" {
