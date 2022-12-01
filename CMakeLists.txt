@@ -1,13 +1,13 @@
-
-project(godot-vpx-extension)
 cmake_minimum_required(VERSION 3.6)
+set(CMAKE_LEGACY_CYGWIN_WIN32 0)
+project(godot-vpx-extension)
 
 set(GODOT_HEADERS_PATH extern/godot-cpp/godot-headers/ CACHE STRING "Path to Godot headers")
 set(CPP_BINDINGS_PATH extern/godot-cpp/ CACHE STRING "Path to C++ bindings")
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(TARGET_PATH linux)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
 	set(TARGET_PATH win64)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 	set(TARGET_PATH macos)
@@ -35,63 +35,28 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(GODOT_COMPILE_FLAGS )
 set(GODOT_LINKER_FLAGS )
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	# using Visual Studio C++
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /EHsc /WX") # /GF /MP
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /DTYPED_METHOD_BIND")
+set(GODOT_LINKER_FLAGS "-static-libgcc -static-libstdc++ -Wl,-R,'$$ORIGIN'")
 
-	if(CMAKE_BUILD_TYPE MATCHES Debug)
-		set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /MDd") # /Od /RTC1 /Zi
-	else()
-		set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /MD /O2") # /Oy /GL /Gy
-		STRING(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-		string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-	endif(CMAKE_BUILD_TYPE MATCHES Debug)
+set(GODOT_COMPILE_FLAGS "-fPIC -g -Wwrite-strings")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wchar-subscripts -Wcomment -Wdisabled-optimization")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wformat -Wformat=2 -Wformat-security -Wformat-y2k")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wimport -Winit-self -Winline -Winvalid-pch")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wmissing-braces -Wmissing-format-attribute")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wredundant-decls -Wreturn-type -Wsequence-point")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wswitch -Wswitch-enum -Wtrigraphs")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wuninitialized -Wunknown-pragmas -Wunreachable-code -Wunused-label")
+set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wunused-value -Wvariadic-macros -Wvolatile-register-var -Wno-error=attributes")
 
-	# Disable conversion warning, truncation, unreferenced var, signed mismatch
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /wd4244 /wd4305 /wd4101 /wd4018 /wd4267")
-
-	add_definitions(-DNOMINMAX)
-
-	# Unkomment for warning level 4
-	#if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-	#	string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	#endif()
-
-else()
-
-#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	# using Clang
-#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	# using GCC and maybe MinGW?
-
-	set(GODOT_LINKER_FLAGS "-static-libgcc -static-libstdc++ -Wl,-R,'$$ORIGIN'")
-
-	# Hmm.. maybe to strikt?
-	set(GODOT_COMPILE_FLAGS "-fPIC -g -Wwrite-strings")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wchar-subscripts -Wcomment -Wdisabled-optimization")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wformat -Wformat=2 -Wformat-security -Wformat-y2k")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wimport -Winit-self -Winline -Winvalid-pch")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wmissing-braces -Wmissing-format-attribute")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wredundant-decls -Wreturn-type -Wsequence-point")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wswitch -Wswitch-enum -Wtrigraphs")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wuninitialized -Wunknown-pragmas -Wunreachable-code -Wunused-label")
-	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wunused-value -Wvariadic-macros -Wvolatile-register-var -Wno-error=attributes")
-
-	# -Wshadow -Wextra -Wall -Weffc++ -Wfloat-equal -Wstack-protector -Wunused-parameter -Wsign-compare -Wunused-variable -Wcast-align
-	# -Wunused-function -Wstrict-aliasing -Wstrict-aliasing=2 -Wmissing-field-initializers
-
-	if(NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
-		set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wno-ignored-attributes")
-	endif()
-
-	if(CMAKE_BUILD_TYPE MATCHES Debug)
-		set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -fno-omit-frame-pointer -O0")
-	else()
-		set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -O3")
-	endif(CMAKE_BUILD_TYPE MATCHES Debug)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
+	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -Wno-ignored-attributes")
 endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -fno-omit-frame-pointer -O0")
+else()
+	set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} -O3")
+endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
 # Get Sources
 file(GLOB_RECURSE SOURCES src/*.c**)
@@ -122,6 +87,9 @@ else()
 endif()
 
 string(TOLOWER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME)
+if (CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+	set(SYSTEM_NAME "windows")
+endif()
 string(TOLOWER ${GODOT_CPP_BUILD_TYPE} BUILD_TYPE)
 
 if(ANDROID)
@@ -163,4 +131,4 @@ target_include_directories(${PROJECT_NAME}
 set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS ${GODOT_COMPILE_FLAGS})
 set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS ${GODOT_LINKER_FLAGS})
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME "gdvpx.${TARGET_PATH}.${GODOT_CPP_BUILD_TYPE}.${BITS}")
+set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME "gdvpx.${SYSTEM_NAME}.${GODOT_CPP_BUILD_TYPE}.${BITS}")
