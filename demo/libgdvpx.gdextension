@@ -1,0 +1,12 @@
+[configuration]
+
+entry_symbol = "example_library_init"
+
+[libraries]
+
+macos.debug = "../bin/macos/libgdvpx.macos.template_debug.framework"
+macos.release = "../bin/macos/libgdvpx.macos.template_release.framework"
+windows.debug.x86_64 = "../bin/win64/libgdvpx.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "../bin/win64/libgdvpx.windows.template_release.x86_64.dll"
+linux.debug.x86_64 = "../bin/linux/libgdvpx.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "../bin/linux/libgdvpx.linux.template_release.x86_64.so"
