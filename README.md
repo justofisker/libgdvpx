@@ -1,7 +1,3 @@
-# libgdvpx
+### Project unfinished, See below link for WebM video decoding in Godot 4
 
-Work in-progress VPX decoder implementation for the Godot game engine.
-
-### Cloning
-
-`git clone https://github.com/justofisker/libgdvpx.git libgdvpx --recursive`
+### https://github.com/kidrigger/godot-video-reference
